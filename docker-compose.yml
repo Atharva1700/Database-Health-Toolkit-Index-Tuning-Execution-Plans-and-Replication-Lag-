@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  postgres-primary:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_INITDB_ARGS: "-c wal_level=replica"
+    ports:
+      - "5432:5432"
+    volumes:
+      - primary_data:/var/lib/postgresql/data
+
+  postgres-replica:
+    image: postgres:15-alpine
+    environment:
+      PGUSER: replicator
+      POSTGRES_INITDB_ARGS: "-c wal_level=replica"
+    ports:
+      - "5433:5432"
+    depends_on:
+      - postgres-primary
+    volumes:
+      - replica_data:/var/lib/postgresql/data
+
+volumes:
+  primary_data:
+  replica_data:
